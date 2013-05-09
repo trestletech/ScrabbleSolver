@@ -21,8 +21,10 @@ import com.gwtplatform.mvp.client.proxy.RevealRootContentEvent;
 import com.trestletech.scrabble.client.place.NameTokens;
 import com.trestletech.scrabble.shared.BoardSettings;
 import com.trestletech.scrabble.shared.BoardVerifier;
+import com.trestletech.scrabble.shared.ScoredWord;
 import com.trestletech.scrabble.shared.SendBoardToServer;
 import com.trestletech.scrabble.shared.SendBoardToServerResult;
+import com.trestletech.scrabble.shared.WordScorer;
 
 public class MainPagePresenter extends
 		Presenter<MainPagePresenter.MyView, MainPagePresenter.MyProxy> {
@@ -33,6 +35,8 @@ public class MainPagePresenter extends
 		HasClickHandlers getRandomClickHandlers();
 		HasClickHandlers[][] getButtons();
 		
+		
+		void setResults(ScoredWord[] results);
 		
 		
 		HasText[][] getValues();
@@ -142,6 +146,8 @@ public class MainPagePresenter extends
 			
 			for (int col = 0; col < BoardSettings.BOARD_SIZE; col++){				
 				String val = valuesHV[row][col].getText();
+				
+				//too long?
 				if (val.length() > 1){
 					getView().setError("Each cube must have only one character in it.");
 					return;
@@ -150,11 +156,14 @@ public class MainPagePresenter extends
 			}
 		}
 		
+		//check that the whole board is valid
 		if (!BoardVerifier.isValidBoard(values)) {
 			getView().setError("Please ensure that each cube has exactly one letter assigned to it.");
 			return;
 		}
 	
+		
+		//if valid, send to server
 		dispatcher.execute(new SendBoardToServer(values),
 				new AsyncCallback<SendBoardToServerResult>() {
 					@Override
@@ -164,7 +173,16 @@ public class MainPagePresenter extends
 	
 					@Override
 					public void onSuccess(SendBoardToServerResult result) {
-						//TODO
+						//compute scores for all words
+						String[] words = result.getResponse();
+						ScoredWord[] scores = new ScoredWord[words.length];
+						
+						for (int i = 0; i < words.length; i++){
+							scores[i] = WordScorer.scoreWord(words[i]);
+						}
+						
+						getView().setResults(scores);
+						
 					}
 				});
 	}

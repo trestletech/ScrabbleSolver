@@ -1,19 +1,16 @@
 package com.trestletech.scrabble.client.core;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
 import com.trestletech.scrabble.shared.BoardSettings;
+import com.trestletech.scrabble.shared.ScoredWord;
 
 public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 
@@ -23,6 +20,7 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 	private final Button solveButton;
 	private final Button randomButton;
 	private final Button clearButton;
+	private final Grid resultsTbl;
 	
 	private final Button[][] boggleBtns;
 	
@@ -50,6 +48,9 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 			}
 		}
 		
+		resultsTbl = new Grid(1, 2);
+		
+		
 		// We can add style names to widgets
 		solveButton.addStyleName("sendButton");
 
@@ -58,6 +59,8 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 		panel.add(clearButton);
 		panel.add(solveButton);
 		panel.add(errorLabel);
+		
+		panel.add(resultsTbl);
 	}
 
 	@Override
@@ -112,5 +115,26 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 	@Override
 	public HasClickHandlers getRandomClickHandlers() {
 		return randomButton;
+	}
+
+	@Override
+	public void setResults(ScoredWord[] results) {
+		
+		//wipe the table
+		resultsTbl.clear(true);
+		resultsTbl.resizeRows(0);
+		
+		//initialize with proper number of rows
+		resultsTbl.resizeRows(results.length + 1);
+		
+		resultsTbl.setText(0, 0, "Word");
+		resultsTbl.setText(0, 1, "Pts");
+				
+		for (int i = 1; i <= results.length; i++){
+			resultsTbl.setText(i, 0, results[i-1].getWord());
+			resultsTbl.setText(i, 1, Integer.toString(results[i-1].getScore()));			
+		}
+		
+		
 	}
 }

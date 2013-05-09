@@ -40,8 +40,10 @@ public class SendTextToServerActionHandler implements
 		String serverInfo = servletContext.getServerInfo();
 		String userAgent = requestProvider.get().getHeader("User-Agent");
 		
-		//TODO
-		return null;
+		//return mocked data.
+		String[] toReturn = {"WORD", "APPLE", "ORANGE"};
+		
+		return (new SendBoardToServerResult(toReturn));
 	}
 
 	@Override
