@@ -98,8 +98,8 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 	}
 
 	@Override
-	public void assignChar(int row, int col, Character ch) {
-		boggleBtns[row][col].setText(ch.toString());
+	public void assignChar(int row, int col, String ch) {
+		boggleBtns[row][col].setText(ch.toString().toUpperCase());
 	}
 
 	@Override
@@ -123,6 +123,11 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 		//wipe the table
 		resultsTbl.clear(true);
 		resultsTbl.resizeRows(0);
+		
+		//if no results, just leave the table empty.
+		if (results == null){
+			return;
+		}
 		
 		//initialize with proper number of rows
 		resultsTbl.resizeRows(results.length + 1);

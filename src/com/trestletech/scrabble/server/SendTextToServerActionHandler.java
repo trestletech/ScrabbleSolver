@@ -28,7 +28,7 @@ public class SendTextToServerActionHandler implements
 	@Override
 	public SendBoardToServerResult execute(SendBoardToServer action,
 			ExecutionContext context) throws ActionException {
-		Character[][] input = action.getBoardToServer();
+		String[][] input = action.getBoardToServer();
 	
 		// Verify that the input is valid.
 		if (!BoardVerifier.isValidBoard(input)) {

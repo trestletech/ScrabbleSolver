@@ -13,16 +13,16 @@ public class BoardVerifier {
 	 * @param board the board to validate
 	 * @return true if valid, false if invalid
 	 */
-	public static boolean isValidBoard(Character[][] board) {
+	public static boolean isValidBoard(String[][] board) {
 		if (board[0].length != BoardSettings.BOARD_SIZE){
 			return false;
 		}
-		for (Character[] row : board){
+		for (String[] row : board){
 			if (row.length != BoardSettings.BOARD_SIZE){
 				return false;
 			}
 			
-			for (Character c : row){
+			for (String c : row){
 				if (c == null){
 					return false;
 				}
@@ -35,8 +35,11 @@ public class BoardVerifier {
 		return true;
 	}
 	
-	public static boolean isValidEntry(Character ch){
-		if (!Character.isLetter(ch)){
+	public static boolean isValidEntry(String ch){
+		if (ch.length() != 1 && !ch.equalsIgnoreCase("qu")){
+			return false;
+		}
+		if (!Character.isLetter(ch.charAt(0)) || ch.equalsIgnoreCase("Q")){
 			return false;
 		}
 		return true;

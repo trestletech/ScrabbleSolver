@@ -43,7 +43,7 @@ public class MainPagePresenter extends
 		
 		String getChar(int row, int col);
 		
-		void assignChar(int row, int col, Character ch);
+		void assignChar(int row, int col, String ch);
 		
 		void clear();
 
@@ -79,7 +79,7 @@ public class MainPagePresenter extends
 				new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
-						sendNameToServer();
+						sendBoardToServer();
 					}
 				}));
 		
@@ -97,7 +97,10 @@ public class MainPagePresenter extends
 				for (int row = 0; row < BoardSettings.BOARD_SIZE; row++){			
 					for (int col = 0; col < BoardSettings.BOARD_SIZE; col++){
 						//randomly assign characters in a uniform distribution
-						char c = (char)(r.nextInt(26) + 'A');
+						String c = Character.toString((char)(r.nextInt(26) + 'A'));
+						if (c.equals("Q")){
+							c = "QU";							
+						}
 						getView().assignChar(row, col, c);
 					}
 				}				
@@ -113,11 +116,11 @@ public class MainPagePresenter extends
 					@Override
 					public void onClick(ClickEvent event) {
 						String ch = Window.prompt("Enter the character for this tile.", getView().getChar(rowNum, colNum));
-						if (ch.length() != 1 || !BoardVerifier.isValidEntry(ch.charAt(0))){
-							getView().setError("You must enter exactly one alphabetic character for each tile.");
+						if (!BoardVerifier.isValidEntry(ch)){
+							getView().setError("You must enter exactly one alphabetic character for each tile (or 'qu').");
 						} else{
 							//valid entry, assign
-							getView().assignChar(rowNum, colNum, ch.charAt(0));
+							getView().assignChar(rowNum, colNum, ch);
 						}
 					}					
 				}));
@@ -136,23 +139,25 @@ public class MainPagePresenter extends
 	/**
 	 * Send the name from the nameField to the server and wait for a response.
 	 */
-	private void sendNameToServer() {
+	private void sendBoardToServer() {
+		getView().setResults(null);
+		
 		// First, we validate the input.
 		getView().setError("");
 		HasText[][] valuesHV = getView().getValues();
-		Character[][] values = new Character[BoardSettings.BOARD_SIZE][];
+		String[][] values = new String[BoardSettings.BOARD_SIZE][];
 		for (int row = 0; row < BoardSettings.BOARD_SIZE; row++){	
-			values[row] = new Character[BoardSettings.BOARD_SIZE];
+			values[row] = new String[BoardSettings.BOARD_SIZE];
 			
 			for (int col = 0; col < BoardSettings.BOARD_SIZE; col++){				
 				String val = valuesHV[row][col].getText();
 				
 				//too long?
-				if (val.length() > 1){
-					getView().setError("Each cube must have only one character in it.");
+				if (!BoardVerifier.isValidEntry(val)){
+					getView().setError("Each cube must have only one character in it (or be 'QU').");
 					return;
 				}
-				values[row][col] = val.charAt(0);
+				values[row][col] = val;
 			}
 		}
 		
@@ -168,7 +173,7 @@ public class MainPagePresenter extends
 				new AsyncCallback<SendBoardToServerResult>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Window.alert(caught.getMessage()); 
+						getView().setError("Error communicating with server. Check that you're online or try again later.");
 					}
 	
 					@Override
