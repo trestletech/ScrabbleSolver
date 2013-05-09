@@ -180,11 +180,8 @@ public class MainPagePresenter extends
 					public void onSuccess(SendBoardToServerResult result) {
 						//compute scores for all words
 						String[] words = result.getResponse();
-						ScoredWord[] scores = new ScoredWord[words.length];
 						
-						for (int i = 0; i < words.length; i++){
-							scores[i] = WordScorer.scoreWord(words[i]);
-						}
+						ScoredWord[] scores = WordScorer.scoreWords(words);
 						
 						getView().setResults(scores);
 						

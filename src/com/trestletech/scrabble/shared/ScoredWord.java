@@ -5,7 +5,7 @@ package com.trestletech.scrabble.shared;
  * @author jalle6
  *
  */
-public class ScoredWord {
+public class ScoredWord implements Comparable<ScoredWord> {
 	private String word;
 	private int score;
 		
@@ -29,4 +29,12 @@ public class ScoredWord {
 	public void setScore(int score) {
 		this.score = score;
 	}
+	
+	@Override
+	public int compareTo(ScoredWord o) {
+		return o.score - this.score;
+	}
+	
+	
+	
 }

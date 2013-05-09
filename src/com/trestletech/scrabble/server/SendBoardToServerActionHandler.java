@@ -11,18 +11,23 @@ import com.gwtplatform.dispatch.server.ExecutionContext;
 import com.gwtplatform.dispatch.shared.ActionException;
 import com.trestletech.scrabble.shared.BoardVerifier;
 
-public class SendTextToServerActionHandler implements
+public class SendBoardToServerActionHandler implements
 		ActionHandler<SendBoardToServer, SendBoardToServerResult> {
 
 	private final ServletContext servletContext;
 
 	private final Provider<HttpServletRequest> requestProvider;
-
+	private final BoggleSolver boggleSolver;
+	
+	
 	@Inject
-	public SendTextToServerActionHandler(final ServletContext servletContext, final Provider<HttpServletRequest> requestProvider) {
+	public SendBoardToServerActionHandler(final ServletContext servletContext, 
+			final Provider<HttpServletRequest> requestProvider, 
+			final BoggleSolver boggleSolver) {
 
 		this.servletContext = servletContext;
 		this.requestProvider = requestProvider;
+		this.boggleSolver = boggleSolver;
 	}
 
 	@Override
@@ -34,16 +39,12 @@ public class SendTextToServerActionHandler implements
 		if (!BoardVerifier.isValidBoard(input)) {
 			// If the input is not valid, throw an IllegalArgumentException back to
 			// the client.
-			throw new ActionException("Name must be at least 4 characters long");
+			throw new ActionException("You must have exactly one character in each cube (or 'qu').");
 		}
-	
-		String serverInfo = servletContext.getServerInfo();
-		String userAgent = requestProvider.get().getHeader("User-Agent");
+			
 		
-		//return mocked data.
-		String[] toReturn = {"WORD", "APPLE", "ORANGE"};
 		
-		return (new SendBoardToServerResult(toReturn));
+		return (new SendBoardToServerResult(boggleSolver.solveBoard(input)));
 	}
 
 	@Override
