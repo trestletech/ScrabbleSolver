@@ -2,10 +2,13 @@ package com.trestletech.scrabble.client.core;
 
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.gwtplatform.mvp.client.ViewImpl;
@@ -16,12 +19,14 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 
 	private static String html = "<h1>Scrabble Solver</h1>";
 	private final HTMLPanel panel = new HTMLPanel(html);
+	private final FlowPanel boardPanel = new FlowPanel();
+	private final HTMLPanel resultsPanel = new HTMLPanel("<h2>Solution</h2>");
 	private final Label errorLabel;
 	private final Button solveButton;
 	private final Button randomButton;
 	private final Button clearButton;
 	private final Grid resultsTbl;
-	
+		
 	private final Button[][] boggleBtns;
 	
 	
@@ -44,6 +49,8 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 				Button b = new Button("");
 				boggleTable.setWidget(row,  col, b);
 				
+				b.getElement().addClassName("boggle-tile");
+				
 				boggleBtns[row][col] = b;
 			}
 		}
@@ -54,13 +61,23 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 		// We can add style names to widgets
 		solveButton.addStyleName("sendButton");
 
-		panel.add(boggleTable);
-		panel.add(randomButton);
-		panel.add(clearButton);
-		panel.add(solveButton);
-		panel.add(errorLabel);
+		boardPanel.add(boggleTable);
 		
-		panel.add(resultsTbl);
+		resultsPanel.add(solveButton);
+		resultsPanel.add(resultsTbl);
+				
+		VerticalPanel leftPanel = new VerticalPanel();
+		
+		leftPanel.add(boardPanel);
+		leftPanel.add(randomButton);
+		leftPanel.add(clearButton);		
+		leftPanel.add(errorLabel);
+		
+		HorizontalPanel horiz = new HorizontalPanel();
+		horiz.add(leftPanel);
+		horiz.add(resultsPanel);
+		
+		panel.add(horiz);		
 	}
 
 	@Override
@@ -118,14 +135,20 @@ public class MainPageView extends ViewImpl implements MainPagePresenter.MyView {
 	}
 
 	@Override
-	public void setResults(ScoredWord[] results) {
-		
+	public void setResults(ScoredWord[] results) {		
 		//wipe the table
 		resultsTbl.clear(true);
 		resultsTbl.resizeRows(0);
 		
 		//if no results, just leave the table empty.
 		if (results == null){
+			return;
+		}
+		
+		//if valid response, but no results
+		if (results.length == 0){
+			resultsTbl.resizeRows(1);
+			resultsTbl.setText(0, 0, "No words in this arrangement.");
 			return;
 		}
 		

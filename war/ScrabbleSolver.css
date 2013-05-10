@@ -1,0 +1,10 @@
+/* Add css rules here for your application. */
+
+button.boggle-tile{
+	width: 80px;
+	height: 80px;
+	background: url('boggle.png') no-repeat;
+	border: none;
+	
+	font-size: 40px;	
+}

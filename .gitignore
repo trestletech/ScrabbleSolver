@@ -5,4 +5,7 @@ target/*
 .settings
 bin
 gwt-unitCache
-war/
+war/scrabblesolver
+war/WEB-INF/lib
+war/WEB-INF/classes
+war/WEB-INF/deploy
